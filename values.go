@@ -18,28 +18,32 @@ type ValuesUnmarshaler interface {
 
 func Unmarshal(u url.Values, i interface{}) error {
 
-	if unmarshaler, ok := i.(ValuesUnmarshaler); ok {
-		return unmarshaler.UnmarshalValues(u)
+	if len(u) == 0 {
+		return nil
 	}
 
 	v := reflect.ValueOf(i)
-	if v.Kind() != reflect.Ptr {
-		panic("values.Unmarshal: requires pointer type")
+	for {
+		if unmarshaler, ok := v.Interface().(ValuesUnmarshaler); ok {
+			return unmarshaler.UnmarshalValues(u)
+		}
+
+		if v.Kind() == reflect.Ptr {
+			if v.IsNil() {
+				v.Set(reflect.New(v.Type().Elem()))
+			}
+			v = v.Elem()
+			continue
+		}
+		break
 	}
 
-	e := v.Elem()
-	// if e.Kind() == reflect.Ptr {
-	// 	if e.IsNil() {
-	// 		e.Set(reflect.New(e.Elem().Type()))
-	// 	}
-	// 	return Unmarshal(u, e.Interface())
-	// }
-
-	if e.Kind() != reflect.Struct {
-		panic("values.Unmarshal: requires pointer to struct type, got" + v.Type().String())
+	if v.Kind() != reflect.Struct {
+		return errors.NewCode(400, "values.Unmarshal: unsupported %q", v.Type())
 	}
-	knownFields := make(map[string]struct{}, e.Type().NumField())
-	if err := unmarshalStruct(knownFields, u, e); err != nil {
+
+	knownFields := make(map[string]struct{}, v.Type().NumField())
+	if err := unmarshalStruct(knownFields, u, v); err != nil {
 		return err
 	}
 	for name := range u {
