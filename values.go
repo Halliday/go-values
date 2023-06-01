@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/halliday/go-errors"
-	"github.com/halliday/go-tools"
+	"github.com/halliday/go-tools/stringtools"
 )
 
 type ValuesUnmarshaler interface {
@@ -77,7 +77,7 @@ func unmarshalStruct(knownFields map[string]struct{}, u url.Values, v reflect.Va
 				continue
 			}
 			if name == "*" {
-				name = tools.CamelToSnake(ft.Name)
+				name = stringtools.CamelToSnake(ft.Name)
 			}
 		} else {
 			if ft.Anonymous {
@@ -87,7 +87,7 @@ func unmarshalStruct(knownFields map[string]struct{}, u url.Values, v reflect.Va
 				}
 				continue
 			}
-			name = tools.CamelToSnake(ft.Name)
+			name = stringtools.CamelToSnake(ft.Name)
 		}
 		knownFields[name] = struct{}{}
 		if w, ok := u[name]; ok {
