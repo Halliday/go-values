@@ -110,7 +110,7 @@ func unmarshalField(name string, v reflect.Value, w []string) (err error) {
 	if ok {
 		err = u.ParseStrings(w)
 		if err != nil {
-			return errors.NewCode(400, "value %q: %w", err)
+			return errors.NewCode(400, "value %q: %v", w, err)
 		}
 		return nil
 	}
