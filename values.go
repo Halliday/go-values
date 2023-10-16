@@ -183,7 +183,6 @@ type StringParser interface {
 }
 
 var timeDurationType = reflect.TypeOf((*time.Duration)(nil)).Elem()
-var timeTimeType = reflect.TypeOf((*time.Time)(nil)).Elem()
 var googleUUIDType = reflect.TypeOf((*uuid.UUID)(nil)).Elem()
 
 func unmarshalString(name string, v reflect.Value, w string) error {
@@ -230,13 +229,6 @@ func unmarshalString(name string, v reflect.Value, w string) error {
 		switch v.Type() {
 		case timeDurationType:
 			d, err := time.ParseDuration(w)
-			if err != nil {
-				return errors.NewCode(400, "value %q: must be an time duration", name)
-			}
-			v.Set(reflect.ValueOf(d))
-
-		case timeTimeType:
-			d, err := time.Parse(time.RFC3339, w)
 			if err != nil {
 				return errors.NewCode(400, "value %q: must be an time duration", name)
 			}
