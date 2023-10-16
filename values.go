@@ -127,10 +127,6 @@ func unmarshalField(name string, v reflect.Value, w []string) (err error) {
 		v.SetBool(true)
 
 	case reflect.Slice:
-		// if len(w) == 0 {
-		// 	v.SetLen(0)
-		// 	break
-		// }
 		if len(w) != 1 {
 			return errors.NewCode(400, "value %q: multiple values", name)
 		}
@@ -158,12 +154,6 @@ func unmarshalField(name string, v reflect.Value, w []string) (err error) {
 
 	default:
 		return unmarshalSingle(name, v, w)
-		// switch t {
-		// case timeDurationType, timeTimeType:
-
-		// default:
-		// 	return errors.Code(400, "value %q: unsupported type %q", name, t)
-		// }
 	}
 	return nil
 }
