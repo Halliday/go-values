@@ -1,6 +1,7 @@
 package values
 
 import (
+	"encoding"
 	"net/url"
 	"reflect"
 	"strconv"
@@ -190,6 +191,15 @@ func unmarshalString(name string, v reflect.Value, w string) error {
 	stringParser, ok := v.Addr().Interface().(StringParser)
 	if ok {
 		err := stringParser.ParseString(w)
+		if err != nil {
+			return errors.NewCode(400, "value %q: %s", name, err)
+		}
+		return nil
+	}
+
+	textUnmarshaler, ok := v.Addr().Interface().(encoding.TextUnmarshaler)
+	if ok {
+		err := textUnmarshaler.UnmarshalText([]byte(w))
 		if err != nil {
 			return errors.NewCode(400, "value %q: %s", name, err)
 		}
